@@ -1,0 +1,89 @@
+package courseregistration.backend;
+
+import java.io.*;
+import java.util.*;
+
+public class BackendModule {
+
+    // ===== Student Class =====
+    public static class Student {
+        private String name;
+        private String department;
+        private String course;
+
+        public Student(String name, String department, String course) {
+            this.name = name;
+            this.department = department;
+            this.course = course;
+        }
+
+        public String toString() {
+            return name + " (" + department + ") registered for " + course;
+        }
+    }
+
+    // ===== Course Class =====
+    public static class Course {
+        private String courseCode;
+        private String courseName;
+
+        public Course(String courseCode, String courseName) {
+            this.courseCode = courseCode;
+            this.courseName = courseName;
+        }
+
+        public String getFullName() {
+            return courseCode + " - " + courseName;
+        }
+    }
+
+    // ===== Registration Manager =====
+    public static class RegistrationManager {
+        private List<Student> registrations = new ArrayList<>();
+        private File file = new File("registrations.txt");
+
+        public String registerStudent(String name, String dept, String course) {
+            if (name.isEmpty() || dept.isEmpty())
+                return "Error: Please fill all fields.";
+
+            Student s = new Student(name, dept, course);
+            registrations.add(s);
+            saveToFile();
+            return s.toString();
+        }
+
+        public void saveToFile() {
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
+                for (Student s : registrations)
+                    pw.println(s);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public List<Student> getRegistrations() {
+            return registrations;
+        }
+    }
+
+    // ===== AutoSave Thread =====
+    public static class AutoSaveService extends Thread {
+        private RegistrationManager manager;
+
+        public AutoSaveService(RegistrationManager manager) {
+            this.manager = manager;
+        }
+
+        public void run() {
+            try {
+                while (true) {
+                    Thread.sleep(5000);
+                    manager.saveToFile();
+                    System.out.println("[AutoSave] Registrations saved.");
+                }
+            } catch (InterruptedException e) {
+                System.out.println("AutoSave stopped.");
+            }
+        }
+    }
+}
