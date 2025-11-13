@@ -1,0 +1,63 @@
+# OOP-MINI-
+package courseregistration.frontend;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import courseregistration.backend.*;
+
+public class CourseRegistrationGUI extends JFrame {
+
+    private JTextField nameField, deptField;
+    private JComboBox<String> courseBox;
+    private JTextArea outputArea;
+    private RegistrationManager manager;
+
+    public CourseRegistrationGUI(RegistrationManager manager) {
+        this.manager = manager;
+
+        setTitle("Course Registration System");
+        setSize(500, 350);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        JLabel title = new JLabel("Course Registration System", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        add(title, BorderLayout.NORTH);
+
+        JPanel panel = new JPanel(new GridLayout(4, 2, 8, 8));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        panel.add(new JLabel("Student Name:"));
+        nameField = new JTextField();
+        panel.add(nameField);
+
+        panel.add(new JLabel("Department:"));
+        deptField = new JTextField();
+        panel.add(deptField);
+
+        panel.add(new JLabel("Select Course:"));
+        courseBox = new JComboBox<>(new String[]{"CS101 - Java", "CS102 - Python", "CS103 - DBMS"});
+        panel.add(courseBox);
+
+        JButton registerBtn = new JButton("Register");
+        registerBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText();
+                String dept = deptField.getText();
+                String course = (String) courseBox.getSelectedItem();
+                String result = manager.registerStudent(name, dept, course);
+                outputArea.append(result + "\n");
+            }
+        });
+
+        panel.add(new JLabel());
+        panel.add(registerBtn);
+
+        add(panel, BorderLayout.CENTER);
+
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        add(new JScrollPane(outputArea), BorderLayout.SOUTH);
+    }
+}
